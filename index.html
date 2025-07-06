@@ -2,100 +2,46 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Your Website</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Showcase</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="Your Logo" class="logo" />
-    <h1>Welcome to Our Product Showcase</h1>
+    <img src="logo.png" alt="Logo" class="logo" />
+    <h1>Welcome to Our Store</h1>
+    <p class="tagline">Your Satisfaction, Our Priority</p>
   </header>
 
   <main>
-    <section class="features">
+    <section class="product-display">
       <h2>Our Products</h2>
-      <p>Explore our wide range of high-quality products.</p>
-      <!-- Keep your existing product features here -->
-    </section>
-
-    <section class="bulk-inquiry">
-      <h2>Bulk Product Inquiry</h2>
-      <form id="bulkForm">
-        <label for="name">Your Name:</label>
-        <input type="text" id="name" required />
-
-        <label for="email">Your Email:</label>
-        <input type="email" id="email" required />
-
-        <label>Select Products:</label>
-        <div class="product-group">
-          <input type="checkbox" id="product1" name="product" value="Product A" />
-          <label for="product1">Product A</label>
-          <input type="number" placeholder="Qty" min="1" id="qty1" />
-        </div>
-        <div class="product-group">
-          <input type="checkbox" id="product2" name="product" value="Product B" />
-          <label for="product2">Product B</label>
-          <input type="number" placeholder="Qty" min="1" id="qty2" />
-        </div>
-        <div class="product-group">
-          <input type="checkbox" id="product3" name="product" value="Product C" />
-          <label for="product3">Product C</label>
-          <input type="number" placeholder="Qty" min="1" id="qty3" />
-        </div>
-
-        <label for="message">Additional Details:</label>
-        <textarea id="message"></textarea>
-
-        <div class="inquiry-buttons">
-          <button type="button" onclick="sendWhatsApp()">📱 WhatsApp Inquiry</button>
-          <button type="button" onclick="sendEmail()">📧 Email Inquiry</button>
-        </div>
-      </form>
+      <div id="productGallery"></div>
     </section>
   </main>
 
   <footer>
-    <p>&copy; 2025 Your Company Name. All rights reserved.</p>
+    <p>&copy; 2025 Your Company. All rights reserved.</p>
   </footer>
 
   <script>
-    function collectInquiryData() {
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
-      const message = document.getElementById("message").value;
+    const products = JSON.parse(localStorage.getItem("products") || "[]");
+    const gallery = document.getElementById("productGallery");
 
-      const products = [];
-      for (let i = 1; i <= 3; i++) {
-        const checkbox = document.getElementById(`product${i}`);
-        const qty = document.getElementById(`qty${i}`).value;
-        if (checkbox.checked && qty) {
-          products.push(`${checkbox.value} (Qty: ${qty})`);
-        }
-      }
-
-      return {
-        name,
-        email,
-        message,
-        products
-      };
-    }
-
-    function sendWhatsApp() {
-      const data = collectInquiryData();
-      const text = `Hello, I'm ${data.name}.\n\nI'd like to inquire about:\n${data.products.join("\n")}\n\nAdditional Details:\n${data.message}`;
-      const url = `https://wa.me/919999999999?text=${encodeURIComponent(text)}`;
-      window.open(url, "_blank");
-    }
-
-    function sendEmail() {
-      const data = collectInquiryData();
-      const subject = "Bulk Product Inquiry";
-      const body = `Name: ${data.name}\nEmail: ${data.email}\n\nProducts:\n${data.products.join("\n")}\n\nAdditional Details:\n${data.message}`;
-      const mailto = `mailto:youremail@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      window.location.href = mailto;
+    if (products.length === 0) {
+      gallery.innerHTML = "<p>No products available right now.</p>";
+    } else {
+      products.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <img src="${p.image}" alt="${p.name}" />
+          <h3>${p.name}</h3>
+          <p><strong>Category:</strong> ${p.category}</p>
+          <p>${p.desc}</p>
+        `;
+        gallery.appendChild(card);
+      });
     }
   </script>
 </body>
