@@ -23,14 +23,16 @@ header {
   font-size: 1.1rem;
   margin-top: 0.5rem;
 }
-
-/* Main Content */
-main {
-  padding: 20px;
+nav a {
+  color: #ffeb3b;
+  text-decoration: none;
+  margin: 0 5px;
 }
+
+/* Product Gallery */
 .product-display {
   max-width: 800px;
-  margin: auto;
+  margin: 20px auto;
 }
 .product-card {
   background: #fff;
