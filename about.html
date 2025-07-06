@@ -2,46 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Loading…</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Us</title>
   <link rel="stylesheet" href="style.css" />
   <script src="data-defaults.js"></script>
+  <script src="theme-toggle.js" defer></script>
 </head>
 <body>
-  <header>
-    <img class="logo" src="" alt="Logo">
-    <h1 id="pageTitle"></h1>
+  <header class="page-header">
+    <img src="images/logo.png" alt="Logo" class="logo" />
+    <h1 id="pageTitle">About Us</h1>
     <p class="tagline"></p>
     <nav id="mainNav"></nav>
+    <button id="themeToggle" class="theme-toggle">🌓</button>
   </header>
 
-  <section class="section">
-    <h2>About Us</h2>
+  <main class="section">
     <div id="pageContent"></div>
-  </section>
+  </main>
 
-  <footer>
-    <p>&copy; 2025 A One Hospitality Services</p>
+  <footer class="section" style="text-align:center;">
+    &copy; 2025 A One Hospitality Services
   </footer>
 
   <script>
-    // load or init data
-    let site = JSON.parse(localStorage.getItem("siteData")) || DEFAULT_DATA;
-    localStorage.setItem("siteData", JSON.stringify(site));
-
-    // header
-    document.querySelector("header .logo").src = site.global.logo;
+    const site = JSON.parse(localStorage.getItem("siteData")) || DEFAULT_DATA;
+    document.querySelector(".logo").src = site.global.logo;
     document.querySelector(".tagline").textContent = site.global.tagline;
-    const nav = document.getElementById("mainNav");
-    site.pages.about.nav.forEach(i => {
-      const a = document.createElement("a");
-      a.href = i.href; a.textContent = i.text;
-      nav.appendChild(a);
-    });
-
-    // title + content
     document.getElementById("pageTitle").textContent = site.pages.about.title;
     document.getElementById("pageContent").innerHTML = site.pages.about.content;
+
+    const nav = document.getElementById("mainNav");
+    site.pages.index.nav.forEach(link => {
+      const a = document.createElement("a");
+      a.href = link.href;
+      a.textContent = link.text;
+      nav.appendChild(a);
+    });
   </script>
 </body>
 </html>
