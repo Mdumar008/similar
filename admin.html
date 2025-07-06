@@ -28,12 +28,13 @@
   </div>
 
   <script>
-    const adminPassword = "admin123"; // Change this to a secure password
+    const adminPassword = "admin123"; // change this to your own
 
     function login() {
       const input = document.getElementById("adminPass").value;
       if (input !== adminPassword) {
-        return alert("Incorrect password!");
+        alert("Incorrect password!");
+        return;
       }
       document.getElementById("login").style.display     = "none";
       document.getElementById("dashboard").style.display = "block";
@@ -42,7 +43,7 @@
 
     document.getElementById("productForm").addEventListener("submit", e => {
       e.preventDefault();
-      const cat = document.getElementById("category").value;
+      const cat  = document.getElementById("category").value;
       const name = document.getElementById("productName").value;
       const desc = document.getElementById("productDesc").value;
       const file = document.getElementById("productImage").files[0];
