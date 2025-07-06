@@ -2,128 +2,127 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Loading…</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>A One Hospitality Services</title>
+  <link rel="stylesheet" href="style.css" />
   <script src="data-defaults.js"></script>
+  <script src="theme-toggle.js" defer></script>
 </head>
 <body>
-  <header>
-    <img class="logo" src="" alt="Logo">
-    <h1 id="pageTitle">…</h1>
-    <p class="tagline"></p>
+  <header class="hero">
     <nav id="mainNav"></nav>
+    <div class="container hero-content">
+      <img src="images/logo.png" alt="Logo" class="logo" />
+      <h1 id="pageTitle">A One Hospitality Services</h1>
+      <p class="tagline"></p>
+      <div class="buttons">
+        <a href="#inquiry" class="btn">Quick Inquiry</a>
+        <a href="#products" class="btn">View Products</a>
+      </div>
+    </div>
+    <button id="themeToggle" class="theme-toggle">🌓</button>
   </header>
 
-  <!-- Product Showcase -->
-  <section class="section" id="productSection">
-    <h2>Our Products</h2>
-    <div id="productList"></div>
-  </section>
+  <main class="container">
+    <section id="products" class="section products-grid"></section>
 
-  <!-- Single Inquiry -->
-  <section class="section">
-    <h2>Quick Inquiry</h2>
-    <label>Name<input id="inqName"></label>
-    <label>Email<input id="inqEmail"></label>
-    <label>Message<textarea id="inqMsg"></textarea></label>
-    <button class="inq-btn" onclick="sendWhatsAppQuick()">📱 WhatsApp</button>
-    <button class="inq-btn" onclick="sendEmailQuick()">📧 Email</button>
-  </section>
+    <section id="inquiry" class="section inquiry">
+      <h2>Quick Inquiry</h2>
+      <label>Name<input id="inqName" type="text" /></label>
+      <label>Email<input id="inqEmail" type="email" /></label>
+      <label>Message<textarea id="inqMsg"></textarea></label>
+      <div class="inq-buttons">
+        <button class="inq-btn" onclick="sendWhatsAppQuick()">📱 WhatsApp</button>
+        <button class="inq-btn" onclick="sendEmailQuick()">📧 Email</button>
+      </div>
+    </section>
 
-  <!-- Bulk Inquiry -->
-  <section class="section">
-    <h2>Bulk Inquiry</h2>
-    <div id="bulkOptions"></div>
-    <label>Additional Details<textarea id="bulkMsg"></textarea></label>
-    <button class="inq-btn" onclick="sendWhatsAppBulk()">📱 WhatsApp</button>
-    <button class="inq-btn" onclick="sendEmailBulk()">📧 Email</button>
-  </section>
+    <section class="section inquiry">
+      <h2>Bulk Inquiry</h2>
+      <div id="bulkOptions"></div>
+      <label>Additional Details<textarea id="bulkMsg"></textarea></label>
+      <div class="inq-buttons">
+        <button class="inq-btn" onclick="sendWhatsAppBulk()">📱 WhatsApp</button>
+        <button class="inq-btn" onclick="sendEmailBulk()">📧 Email</button>
+      </div>
+    </section>
+  </main>
 
-  <footer>
-    <p>&copy; 2025 A One Hospitality Services</p>
+  <footer class="section" style="text-align:center;">
+    &copy; 2025 A One Hospitality Services
   </footer>
 
   <script>
-  //— Helper: load or init data
-  function loadData() {
-    let data = JSON.parse(localStorage.getItem("siteData")||"null");
-    if (!data) {
-      data = DEFAULT_DATA;
-      localStorage.setItem("siteData", JSON.stringify(data));
-    }
-    return data;
-  }
-  const site = loadData();
+    const site = JSON.parse(localStorage.getItem("siteData")) || DEFAULT_DATA;
+    document.querySelector(".logo").src = site.global.logo;
+    document.querySelector(".tagline").textContent = site.global.tagline;
+    document.getElementById("pageTitle").textContent = site.pages.index.title;
 
-  //— Build header
-  document.querySelector("header .logo").src = site.global.logo;
-  document.querySelector(".tagline").textContent = site.global.tagline;
-  document.getElementById("pageTitle").textContent = site.pages.index.title;
-  const nav = document.getElementById("mainNav");
-  site.pages.index.nav.forEach(item => {
-    const a = document.createElement("a");
-    a.href = item.href; a.textContent = item.text;
-    nav.appendChild(a);
-  });
+    const nav = document.getElementById("mainNav");
+    site.pages.index.nav.forEach(link => {
+      const a = document.createElement("a");
+      a.href = link.href;
+      a.textContent = link.text;
+      nav.appendChild(a);
+    });
 
-  //— Render products
-  const products = site.products;
-  const list = document.getElementById("productList");
-  list.innerHTML = products.length
-    ? products.map(p=>`
-        <div class="product-card">
-          <img src="${p.image}" alt="${p.name}">
-          <div>
-            <h3>${p.name}</h3>
-            <p><strong>Category:</strong> ${p.category}</p>
-            <p>${p.desc}</p>
+    const products = site.products || [];
+    const productSection = document.getElementById("products");
+    productSection.innerHTML = products.length
+      ? products.map(p => `
+          <div class="product-card">
+            <img src="${p.image}" alt="${p.name}">
+            <div class="info">
+              <h3>${p.name}</h3>
+              <p>${p.desc}</p>
+              <small>Category: ${p.category}</small>
+            </div>
           </div>
-        </div>
-      `).join("")
-    : "<p>No products available.</p>";
+        `).join("")
+      : "<p>No products available.</p>";
 
-  //— Bulk options
-  const bulk = document.getElementById("bulkOptions");
-  bulk.innerHTML = products.length
-    ? products.map((p,i)=>`
-        <label>
-          <input type="checkbox" id="bp${i}" data-name="${p.name}">
-          ${p.name}
-          <input type="number" id="bq${i}" min="1" placeholder="Qty" style="width:60px; margin-left:8px">
-        </label>
-      `).join("")
-    : "<p>No products to inquire.</p>";
+    const bulk = document.getElementById("bulkOptions");
+    bulk.innerHTML = products.map((p, i) => `
+      <label>
+        <input type="checkbox" id="bp${i}" />
+        ${p.name}
+        <input type="number" id="bq${i}" min="1" placeholder="Qty" />
+      </label>
+    `).join("");
 
-  //— Inquiry functions
-  function sendWhatsAppQuick(){
-    const n=inqName.value, e=inqEmail.value, m=inqMsg.value;
-    const txt=`Hi, I'm ${n}. ${m} (Reply: ${e})`;
-    window.open(`https://wa.me/919999999999?text=${encodeURIComponent(txt)}`);
-  }
-  function sendEmailQuick(){
-    const n=inqName.value, e=inqEmail.value, m=inqMsg.value;
-    const sub="Quick Inquiry", bd=`Name: ${n}\nEmail: ${e}\n\n${m}`;
-    window.location.href=`mailto:youremail@example.com?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(bd)}`;
-  }
-  function sendWhatsAppBulk(){
-    const lines=[]; site.products.forEach((p,i)=>{
-      const chk=document.getElementById(`bp${i}`),
-            qty=document.getElementById(`bq${i}`).value;
-      if(chk.checked && qty) lines.push(`${p.name} (Qty:${qty})`);
-    });
-    const txt=`Bulk order:\n${lines.join("\n")}\n\n${bulkMsg.value}`;
-    window.open(`https://wa.me/919999999999?text=${encodeURIComponent(txt)}`);
-  }
-  function sendEmailBulk(){
-    const lines=[]; site.products.forEach((p,i)=>{
-      const chk=document.getElementById(`bp${i}`),
-            qty=document.getElementById(`bq${i}`).value;
-      if(chk.checked && qty) lines.push(`${p.name} (Qty:${qty})`);
-    });
-    const sub="Bulk Inquiry", bd=`Products:\n${lines.join("\n")}\n\nDetails: ${bulkMsg.value}`;
-    window.location.href=`mailto:youremail@example.com?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(bd)}`;
-  }
+    function sendWhatsAppQuick() {
+      const txt = `Hi, I'm ${inqName.value}. ${inqMsg.value} (Reply: ${inqEmail.value})`;
+      window.open(`https://wa.me/919999999999?text=${encodeURIComponent(txt)}`);
+    }
+
+    function sendEmailQuick() {
+      const subject = "Quick Inquiry";
+      const body = `Name: ${inqName.value}\nEmail: ${inqEmail.value}\n\n${inqMsg.value}`;
+      location.href = `mailto:youremail@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
+
+    function sendWhatsAppBulk() {
+      const lines = [];
+      products.forEach((p, i) => {
+        const chk = document.getElementById(`bp${i}`);
+        const qty = document.getElementById(`bq${i}`).value;
+        if (chk.checked && qty) lines.push(`${p.name} (Qty: ${qty})`);
+      });
+      const txt = `Bulk order:\n${lines.join("\n")}\n\nDetails: ${bulkMsg.value}`;
+      window.open(`https://wa.me/919999999999?text=${encodeURIComponent(txt)}`);
+    }
+
+    function sendEmailBulk() {
+      const lines = [];
+      products.forEach((p, i) => {
+        const chk = document.getElementById(`bp${i}`);
+        const qty = document.getElementById(`bq${i}`).value;
+        if (chk.checked && qty) lines.push(`${p.name} (Qty: ${qty})`);
+      });
+      const subject = "Bulk Inquiry";
+      const body = `Products:\n${lines.join("\n")}\n\nDetails: ${bulkMsg.value}`;
+      location.href = `mailto:youremail@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
   </script>
 </body>
 </html>
