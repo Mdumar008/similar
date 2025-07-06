@@ -25,24 +25,22 @@
   </footer>
 
   <script>
-    const products = JSON.parse(localStorage.getItem("products") || "[]");
-    const gallery = document.getElementById("productGallery");
+    document.addEventListener("DOMContentLoaded", () => {
+      const gallery = document.getElementById("productGallery");
+      const products = JSON.parse(localStorage.getItem("products") || "[]");
 
-    if (products.length === 0) {
-      gallery.innerHTML = "<p>No products available right now.</p>";
-    } else {
-      products.forEach(p => {
-        const card = document.createElement("div");
-        card.className = "product-card";
-        card.innerHTML = `
-          <img src="${p.image}" alt="${p.name}" />
-          <h3>${p.name}</h3>
-          <p><strong>Category:</strong> ${p.category}</p>
-          <p>${p.desc}</p>
-        `;
-        gallery.appendChild(card);
-      });
-    }
+      if (!gallery) return;
+      gallery.innerHTML = products.length
+        ? products.map(p => `
+            <div class="product-card">
+              <img src="${p.image}" alt="${p.name}" />
+              <h3>${p.name}</h3>
+              <p><strong>Category:</strong> ${p.category}</p>
+              <p>${p.desc}</p>
+            </div>
+          `).join("")
+        : "<p>No products available right now.</p>";
+    });
   </script>
 </body>
 </html>
