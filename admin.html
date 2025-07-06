@@ -1,137 +1,137 @@
+<!-- admin.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Panel</title>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="style.css" />
   <script src="data-defaults.js"></script>
+  <script src="theme-toggle.js" defer></script>
 </head>
 <body>
   <div class="login-container" id="login">
     <h2>Admin Login</h2>
-    <input id="adminPass" type="password" placeholder="Password"/>
+    <input id="adminPass" type="password" placeholder="Enter Password" />
     <button onclick="login()">Login</button>
   </div>
 
-  <div class="dashboard" id="dashboard">
+  <div class="dashboard" id="dashboard" style="display:none;">
+    <h2>Admin Panel</h2>
+    <button id="themeToggle" class="theme-toggle">🌓</button>
+
+    <!-- Tabs -->
     <div class="tab-buttons">
-      <button data-tab="global" class="active">Global</button>
-      <button data-tab="pages">Pages</button>
-      <button data-tab="products">Products</button>
+      <button onclick="showTab('global')" class="active">🌐 Global</button>
+      <button onclick="showTab('pages')">📄 Pages</button>
+      <button onclick="showTab('products')">📦 Products</button>
     </div>
 
     <!-- Global Settings -->
-    <div id="global" class="admin-section active">
+    <div class="admin-section" id="global">
       <h3>Global Settings</h3>
-      <label>Logo URL<input id="gLogo"/></label>
-      <label>Tagline<input id="gTagline"/></label>
+      <label>Logo URL<input id="gLogo" /></label>
+      <label>Tagline<input id="gTagline" /></label>
       <button onclick="saveGlobal()">Save Global</button>
     </div>
 
-    <!-- Page Titles & Content -->
-    <div id="pages" class="admin-section">
-      <h3>Page Content</h3>
+    <!-- Page Editor -->
+    <div class="admin-section" id="pages" style="display:none;">
+      <h3>Edit Page Content</h3>
       <select id="pageSelect" onchange="loadPageEditor()">
-        <option value="index">Home</option>
         <option value="about">About</option>
         <option value="hos">Hospitality</option>
         <option value="sta">Services</option>
       </select>
-      <label>Title<input id="pTitle"/></label>
-      <label>Content<textarea id="pContent" rows="6"></textarea></label>
+      <label>Page Title<input id="pTitle" /></label>
+      <label>Page Content<textarea id="pContent" rows="6"></textarea></label>
       <button onclick="savePage()">Save Page</button>
     </div>
 
-    <!-- Product Management -->
-    <div id="products" class="admin-section">
-      <h3>Products</h3>
-      <form id="prodForm">
-        <label>Category<input id="prodCat"/></label>
-        <label>Name<input id="prodName"/></label>
-        <label>Description<textarea id="prodDesc" rows="3"></textarea></label>
-        <label>Image<input id="prodImg" type="file" accept="image/*"/></label>
+    <!-- Product Manager -->
+    <div class="admin-section" id="products" style="display:none;">
+      <h3>Add Product</h3>
+      <form id="productForm">
+        <label>Category<input id="category" required /></label>
+        <label>Name<input id="productName" required /></label>
+        <label>Description<textarea id="productDesc" rows="3"></textarea></label>
+        <label>Image<input id="productImage" type="file" accept="image/*" required /></label>
         <button type="submit">Add Product</button>
       </form>
-      <div id="prodList"></div>
+
+      <h3>Product List</h3>
+      <div id="productList"></div>
     </div>
   </div>
 
   <script>
-    let site = JSON.parse(localStorage.getItem("siteData"))||DEFAULT_DATA;
-    function login(){
-      if(adminPass.value!=="admin123") return alert("Wrong");
-      login.style.display="none";
-      dashboard.style.display="block";
-      initTabs(); loadGlobal(); loadPageEditor(); loadProducts();
+    const ADMIN_PASSWORD = "admin123";
+    let site = JSON.parse(localStorage.getItem("siteData")) || DEFAULT_DATA;
+
+    function login() {
+      if (adminPass.value !== ADMIN_PASSWORD) return alert("Incorrect password");
+      login.style.display = "none";
+      dashboard.style.display = "block";
+      loadGlobal();
+      loadPageEditor();
+      loadProducts();
     }
-    function initTabs(){
-      document.querySelectorAll(".tab-buttons button").forEach(btn=>{
-        btn.onclick=()=>{
-          document.querySelectorAll(".tab-buttons button").forEach(b=>b.classList.remove("active"));
-          btn.classList.add("active");
-          document.querySelectorAll(".admin-section").forEach(s=>s.classList.remove("active"));
-          document.getElementById(btn.dataset.tab).classList.add("active");
-        };
-      });
+
+    function showTab(tab) {
+      document.querySelectorAll(".admin-section").forEach(s => s.style.display = "none");
+      document.querySelectorAll(".tab-buttons button").forEach(b => b.classList.remove("active"));
+      document.getElementById(tab).style.display = "block";
+      event.target.classList.add("active");
     }
-    function saveData(){ localStorage.setItem("siteData",JSON.stringify(site)); }
 
     // Global
-    function loadGlobal(){
+    function loadGlobal() {
       gLogo.value = site.global.logo;
       gTagline.value = site.global.tagline;
     }
-    function saveGlobal(){
+    function saveGlobal() {
       site.global.logo = gLogo.value;
       site.global.tagline = gTagline.value;
-      saveData(); alert("Global saved");
+      saveSite();
+      alert("Global settings saved.");
     }
 
     // Pages
-    function loadPageEditor(){
+    function loadPageEditor() {
       const key = pageSelect.value;
       pTitle.value = site.pages[key].title;
       pContent.value = site.pages[key].content;
     }
-    function savePage(){
+    function savePage() {
       const key = pageSelect.value;
-      site.pages[key].title   = pTitle.value;
+      site.pages[key].title = pTitle.value;
       site.pages[key].content = pContent.value;
-      saveData(); alert("Page saved");
+      saveSite();
+      alert("Page content saved.");
     }
 
     // Products
-    prodForm.addEventListener("submit", e=>{
+    productForm.addEventListener("submit", e => {
       e.preventDefault();
-      const file = prodImg.files[0];
-      if(!file) return alert("Pick image");
+      const file = productImage.files[0];
+      if (!file) return alert("Please select an image.");
       const reader = new FileReader();
-      reader.onload = ()=> {
+      reader.onload = () => {
         site.products.push({
-          category: prodCat.value,
-          name: prodName.value,
-          desc: prodDesc.value,
+          category: category.value,
+          name: productName.value,
+          desc: productDesc.value,
           image: reader.result
         });
-        saveData(); loadProducts(); prodForm.reset();
+        saveSite();
+        loadProducts();
+        productForm.reset();
       };
       reader.readAsDataURL(file);
     });
-    function loadProducts(){
-      prodList.innerHTML = site.products.map((p,i)=>`
-        <div class="product-card">
-          <img src="${p.image}" width="60"/>
-          <strong>${p.name}</strong>(${p.category})
-          <p>${p.desc}</p>
-          <button onclick="delProd(${i})">Delete</button>
-        </div>
-      `).join("")||"<p>No products.</p>";
-    }
-    function delProd(i){
-      site.products.splice(i,1);
-      saveData(); loadProducts();
-    }
-  </script>
-</body>
-</html>
+
+    function loadProducts() {
+      const list = document.getElementById("productList");
+      const products = site.products || [];
+      list.innerHTML = products.length
+        ? products.map((p
