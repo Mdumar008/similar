@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="login-container" id="login">
+    <h2>Admin Login</h2>
+    <input type="password" id="adminPass" placeholder="Enter Admin Password" />
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div class="dashboard" id="dashboard" style="display:none;">
+    <h2>Manage Products</h2>
+    <form id="productForm">
+      <input type="text" id="category" placeholder="Category" required />
+      <input type="text" id="productName" placeholder="Product Name" required />
+      <textarea id="productDesc" placeholder="Product Description"></textarea>
+      <input type="file" id="productImage" accept="image/*" required />
+      <button type="submit">Add Product</button>
+    </form>
+
+    <h3>Product List</h3>
+    <div id="productList"></div>
+  </div>
+
+  <script>
+    const adminPassword = "admin123"; // Change this password
+
+    function login() {
+      const input = document.getElementById("adminPass").value;
+      if (input === adminPassword) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        loadProducts();
+      } else {
+        alert("Incorrect password!");
+      }
+    }
+
+    document.getElementById("productForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const category = document.getElementById("category").value;
+      const name = document.getElementById("productName").value;
+      const desc = document.getElementById("productDesc").value;
+      const imageInput = document.getElementById("productImage");
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const image = reader.result;
+        const product = { category, name, desc, image };
+        saveProduct(product);
+      };
+      reader.readAsDataURL(imageInput.files[0]);
+    });
+
+    function saveProduct(product) {
+      const products = JSON.parse(localStorage.getItem("products") || "[]");
+      products.push(product);
+      localStorage.setItem("products", JSON.stringify(products));
+      loadProducts();
+    }
+
+    function loadProducts() {
+      const products = JSON.parse(localStorage.getItem("products") || "[]");
+      const list = document.getElementById("productList");
+      list.innerHTML = "";
+      products.forEach((p, index) => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <img src="${p.image}" width="100" />
+          <strong>${p.name}</strong> (${p.category})<br/>
+          <p>${p.desc}</p>
+          <button onclick="deleteProduct(${index})">Delete</button>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    function deleteProduct(index) {
+      const products = JSON.parse(localStorage.getItem("products") || "[]");
+      products.splice(index, 1);
+      localStorage.setItem("products", JSON.stringify(products));
+      loadProducts();
+    }
+  </script>
+</body>
+</html>
