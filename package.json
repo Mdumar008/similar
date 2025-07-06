@@ -1,16 +1,11 @@
 {
-  "name": "aone-hospitality-services",
+  "name": "similar",
   "version": "1.0.0",
-  "description": "Aone Hospitality Services website",
-  "main": "index.html",
+  "description": "A One Hospitality Services – static site with no-code admin",
   "scripts": {
-    "build": "echo 'Build complete - static HTML files ready'",
-    "start": "echo 'Static HTML website - open index.html in browser'",
-    "dev": "echo 'Development mode - open index.html in browser'"
+    "start": "live-server --port=8080 --open=./index.html"
   },
-  "keywords": ["hospitality", "services", "static-website"],
-  "author": "Aone Hospitality Services",
-  "license": "ISC",
-  "devDependencies": {},
-  "dependencies": {}
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
 }
