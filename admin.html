@@ -7,19 +7,19 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="login-container" id="login">
+  <div id="login" class="login-container">
     <h2>Admin Login</h2>
-    <input type="password" id="adminPass" placeholder="Enter Admin Password" />
+    <input id="adminPass" type="password" placeholder="Enter Admin Password" />
     <button onclick="login()">Login</button>
   </div>
 
-  <div class="dashboard" id="dashboard" style="display:none;">
+  <div id="dashboard" class="dashboard" style="display:none;">
     <h2>Manage Products</h2>
     <form id="productForm">
-      <input type="text" id="category" placeholder="Category" required />
-      <input type="text" id="productName" placeholder="Product Name" required />
+      <input id="category"     type="text"     placeholder="Category" required />
+      <input id="productName"  type="text"     placeholder="Product Name" required />
       <textarea id="productDesc" placeholder="Product Description"></textarea>
-      <input type="file" id="productImage" accept="image/*" required />
+      <input id="productImage" type="file"     accept="image/*" required />
       <button type="submit">Add Product</button>
     </form>
 
@@ -28,62 +28,53 @@
   </div>
 
   <script>
-    const adminPassword = "admin123"; // Change this password
+    const adminPassword = "admin123"; // Change this to a secure password
 
     function login() {
       const input = document.getElementById("adminPass").value;
-      if (input === adminPassword) {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("dashboard").style.display = "block";
-        loadProducts();
-      } else {
-        alert("Incorrect password!");
+      if (input !== adminPassword) {
+        return alert("Incorrect password!");
       }
-    }
-
-    document.getElementById("productForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const category = document.getElementById("category").value;
-      const name = document.getElementById("productName").value;
-      const desc = document.getElementById("productDesc").value;
-      const imageInput = document.getElementById("productImage");
-
-      const reader = new FileReader();
-      reader.onload = function () {
-        const image = reader.result;
-        const product = { category, name, desc, image };
-        saveProduct(product);
-      };
-      reader.readAsDataURL(imageInput.files[0]);
-    });
-
-    function saveProduct(product) {
-      const products = JSON.parse(localStorage.getItem("products") || "[]");
-      products.push(product);
-      localStorage.setItem("products", JSON.stringify(products));
+      document.getElementById("login").style.display     = "none";
+      document.getElementById("dashboard").style.display = "block";
       loadProducts();
     }
 
+    document.getElementById("productForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const cat = document.getElementById("category").value;
+      const name = document.getElementById("productName").value;
+      const desc = document.getElementById("productDesc").value;
+      const file = document.getElementById("productImage").files[0];
+      if (!file) return alert("Please select an image.");
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const products = JSON.parse(localStorage.getItem("products") || "[]");
+        products.push({ category: cat, name, desc, image: reader.result });
+        localStorage.setItem("products", JSON.stringify(products));
+        loadProducts();
+        document.getElementById("productForm").reset();
+      };
+      reader.readAsDataURL(file);
+    });
+
     function loadProducts() {
-      const products = JSON.parse(localStorage.getItem("products") || "[]");
       const list = document.getElementById("productList");
-      list.innerHTML = "";
-      products.forEach((p, index) => {
-        const card = document.createElement("div");
-        card.className = "product-card";
-        card.innerHTML = `
-          <img src="${p.image}" width="100" />
-          <strong>${p.name}</strong> (${p.category})<br/>
+      const products = JSON.parse(localStorage.getItem("products") || "[]");
+      list.innerHTML = products.map((p, i) => `
+        <div class="product-card">
+          <img src="${p.image}" width="100" alt="${p.name}" />
+          <strong>${p.name}</strong> (${p.category})
           <p>${p.desc}</p>
-          <button onclick="deleteProduct(${index})">Delete</button>
-        `;
-        list.appendChild(card);
-      });
+          <button onclick="deleteProduct(${i})">Delete</button>
+        </div>
+      `).join("") || "<p>No products yet.</p>";
     }
 
-    function deleteProduct(index) {
+    function deleteProduct(i) {
       const products = JSON.parse(localStorage.getItem("products") || "[]");
-      products.splice(index, 1);
+      products.splice(i, 1);
       localStorage.setItem("products", JSON.stringify(products));
       loadProducts();
     }
