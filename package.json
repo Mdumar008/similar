@@ -1,0 +1,16 @@
+{
+  "name": "aone-hospitality-services",
+  "version": "1.0.0",
+  "description": "Aone Hospitality Services website",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Build complete - static HTML files ready'",
+    "start": "echo 'Static HTML website - open index.html in browser'",
+    "dev": "echo 'Development mode - open index.html in browser'"
+  },
+  "keywords": ["hospitality", "services", "static-website"],
+  "author": "Aone Hospitality Services",
+  "license": "ISC",
+  "devDependencies": {},
+  "dependencies": {}
+}
