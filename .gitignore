@@ -1,2 +1,13 @@
 node_modules/
-.env
+.env# Node
+node_modules/
+npm-debug.log
+
+# System
+.DS_Store
+
+# VSCode
+.vscode/
+
+# LocalStorage backup (if any)
+*.json
