@@ -3,30 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Personal Website</title>
+  <title>Your Website</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1>Welcome to My Website</h1>
-    <p>Your tagline or short intro goes here.</p>
+    <img src="logo.png" alt="Your Logo" class="logo" />
+    <h1>Welcome to Our Product Showcase</h1>
   </header>
 
-  <section class="about">
-    <h2>About Me</h2>
-    <p>Hi! I'm [Your Name], a web developer passionate about building beautiful and functional websites.</p>
-  </section>
+  <main>
+    <section class="features">
+      <h2>Our Products</h2>
+      <p>Explore our wide range of high-quality products.</p>
+      <!-- Keep your existing product features here -->
+    </section>
 
-  <section class="projects">
-    <h2>Projects</h2>
-    <ul>
-      <li><strong>Project 1:</strong> Description of your first project.</li>
-      <li><strong>Project 2:</strong> Description of your second project.</li>
-    </ul>
-  </section>
+    <section class="inquiry">
+      <h2>Inquire Now</h2>
+      <p>Have questions or want to place a bulk order?</p>
+      <div class="inquiry-buttons">
+        <a href="https://wa.me/919999999999" class="whatsapp-btn" target="_blank">📱 WhatsApp Us</a>
+        <a href="mailto:youremail@example.com" class="email-btn">📧 Email Us</a>
+      </div>
+    </section>
+
+    <section class="bulk-inquiry">
+      <h2>Bulk Product Inquiry</h2>
+      <form action="mailto:youremail@example.com" method="POST" enctype="text/plain">
+        <label for="name">Your Name:</label>
+        <input type="text" id="name" name="name" required />
+
+        <label for="email">Your Email:</label>
+        <input type="email" id="email" name="email" required />
+
+        <label for="product">Product Name:</label>
+        <input type="text" id="product" name="product" required />
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" required />
+
+        <label for="message">Additional Details:</label>
+        <textarea id="message" name="message"></textarea>
+
+        <button type="submit">Send Inquiry</button>
+      </form>
+    </section>
+  </main>
 
   <footer>
-    <p>© 2025 Your Name. All rights reserved.</p>
+    <p>&copy; 2025 Your Company Name. All rights reserved.</p>
   </footer>
 </body>
 </html>
