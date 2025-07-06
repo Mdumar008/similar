@@ -1,83 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Admin Panel</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
+  <script src="data-defaults.js"></script>
 </head>
 <body>
-  <div id="login" class="login-container">
+  <div class="login-container" id="login">
     <h2>Admin Login</h2>
-    <input id="adminPass" type="password" placeholder="Enter Admin Password" />
+    <input id="adminPass" type="password" placeholder="Password"/>
     <button onclick="login()">Login</button>
   </div>
 
-  <div id="dashboard" class="dashboard" style="display:none;">
-    <h2>Manage Products</h2>
-    <form id="productForm">
-      <input id="category"     type="text"     placeholder="Category" required />
-      <input id="productName"  type="text"     placeholder="Product Name" required />
-      <textarea id="productDesc" placeholder="Product Description"></textarea>
-      <input id="productImage" type="file"     accept="image/*" required />
-      <button type="submit">Add Product</button>
-    </form>
+  <div class="dashboard" id="dashboard">
+    <div class="tab-buttons">
+      <button data-tab="global" class="active">Global</button>
+      <button data-tab="pages">Pages</button>
+      <button data-tab="products">Products</button>
+    </div>
 
-    <h3>Product List</h3>
-    <div id="productList"></div>
+    <!-- Global Settings -->
+    <div id="global" class="admin-section active">
+      <h3>Global Settings</h3>
+      <label>Logo URL<input id="gLogo"/></label>
+      <label>Tagline<input id="gTagline"/></label>
+      <button onclick="saveGlobal()">Save Global</button>
+    </div>
+
+    <!-- Page Titles & Content -->
+    <div id="pages" class="admin-section">
+      <h3>Page Content</h3>
+      <select id="pageSelect" onchange="loadPageEditor()">
+        <option value="index">Home</option>
+        <option value="about">About</option>
+        <option value="hos">Hospitality</option>
+        <option value="sta">Services</option>
+      </select>
+      <label>Title<input id="pTitle"/></label>
+      <label>Content<textarea id="pContent" rows="6"></textarea></label>
+      <button onclick="savePage()">Save Page</button>
+    </div>
+
+    <!-- Product Management -->
+    <div id="products" class="admin-section">
+      <h3>Products</h3>
+      <form id="prodForm">
+        <label>Category<input id="prodCat"/></label>
+        <label>Name<input id="prodName"/></label>
+        <label>Description<textarea id="prodDesc" rows="3"></textarea></label>
+        <label>Image<input id="prodImg" type="file" accept="image/*"/></label>
+        <button type="submit">Add Product</button>
+      </form>
+      <div id="prodList"></div>
+    </div>
   </div>
 
   <script>
-    const adminPassword = "admin123"; // change this to your own
+    let site = JSON.parse(localStorage.getItem("siteData"))||DEFAULT_DATA;
+    function login(){
+      if(adminPass.value!=="admin123") return alert("Wrong");
+      login.style.display="none";
+      dashboard.style.display="block";
+      initTabs(); loadGlobal(); loadPageEditor(); loadProducts();
+    }
+    function initTabs(){
+      document.querySelectorAll(".tab-buttons button").forEach(btn=>{
+        btn.onclick=()=>{
+          document.querySelectorAll(".tab-buttons button").forEach(b=>b.classList.remove("active"));
+          btn.classList.add("active");
+          document.querySelectorAll(".admin-section").forEach(s=>s.classList.remove("active"));
+          document.getElementById(btn.dataset.tab).classList.add("active");
+        };
+      });
+    }
+    function saveData(){ localStorage.setItem("siteData",JSON.stringify(site)); }
 
-    function login() {
-      const input = document.getElementById("adminPass").value;
-      if (input !== adminPassword) {
-        alert("Incorrect password!");
-        return;
-      }
-      document.getElementById("login").style.display     = "none";
-      document.getElementById("dashboard").style.display = "block";
-      loadProducts();
+    // Global
+    function loadGlobal(){
+      gLogo.value = site.global.logo;
+      gTagline.value = site.global.tagline;
+    }
+    function saveGlobal(){
+      site.global.logo = gLogo.value;
+      site.global.tagline = gTagline.value;
+      saveData(); alert("Global saved");
     }
 
-    document.getElementById("productForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const cat  = document.getElementById("category").value;
-      const name = document.getElementById("productName").value;
-      const desc = document.getElementById("productDesc").value;
-      const file = document.getElementById("productImage").files[0];
-      if (!file) return alert("Please select an image.");
+    // Pages
+    function loadPageEditor(){
+      const key = pageSelect.value;
+      pTitle.value = site.pages[key].title;
+      pContent.value = site.pages[key].content;
+    }
+    function savePage(){
+      const key = pageSelect.value;
+      site.pages[key].title   = pTitle.value;
+      site.pages[key].content = pContent.value;
+      saveData(); alert("Page saved");
+    }
 
+    // Products
+    prodForm.addEventListener("submit", e=>{
+      e.preventDefault();
+      const file = prodImg.files[0];
+      if(!file) return alert("Pick image");
       const reader = new FileReader();
-      reader.onload = () => {
-        const products = JSON.parse(localStorage.getItem("products") || "[]");
-        products.push({ category: cat, name, desc, image: reader.result });
-        localStorage.setItem("products", JSON.stringify(products));
-        loadProducts();
-        document.getElementById("productForm").reset();
+      reader.onload = ()=> {
+        site.products.push({
+          category: prodCat.value,
+          name: prodName.value,
+          desc: prodDesc.value,
+          image: reader.result
+        });
+        saveData(); loadProducts(); prodForm.reset();
       };
       reader.readAsDataURL(file);
     });
-
-    function loadProducts() {
-      const list = document.getElementById("productList");
-      const products = JSON.parse(localStorage.getItem("products") || "[]");
-      list.innerHTML = products.map((p, i) => `
+    function loadProducts(){
+      prodList.innerHTML = site.products.map((p,i)=>`
         <div class="product-card">
-          <img src="${p.image}" width="100" alt="${p.name}" />
-          <strong>${p.name}</strong> (${p.category})
+          <img src="${p.image}" width="60"/>
+          <strong>${p.name}</strong>(${p.category})
           <p>${p.desc}</p>
-          <button onclick="deleteProduct(${i})">Delete</button>
+          <button onclick="delProd(${i})">Delete</button>
         </div>
-      `).join("") || "<p>No products yet.</p>";
+      `).join("")||"<p>No products.</p>";
     }
-
-    function deleteProduct(i) {
-      const products = JSON.parse(localStorage.getItem("products") || "[]");
-      products.splice(i, 1);
-      localStorage.setItem("products", JSON.stringify(products));
-      loadProducts();
+    function delProd(i){
+      site.products.splice(i,1);
+      saveData(); loadProducts();
     }
   </script>
 </body>
