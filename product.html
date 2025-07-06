@@ -1,55 +1,53 @@
+<!-- product.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Loading…</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Products</title>
+  <link rel="stylesheet" href="style.css" />
   <script src="data-defaults.js"></script>
+  <script src="theme-toggle.js" defer></script>
 </head>
 <body>
-  <header>
-    <img class="logo" src="" alt="Logo">
-    <h1 id="pageTitle"></h1>
+  <header class="page-header">
+    <img src="images/logo.png" alt="Logo" class="logo" />
+    <h1 id="pageTitle">Products</h1>
     <p class="tagline"></p>
     <nav id="mainNav"></nav>
+    <button id="themeToggle" class="theme-toggle">🌓</button>
   </header>
 
-  <section class="section">
-    <h2>Products</h2>
-    <div id="productList"></div>
-  </section>
+  <main class="section products-grid" id="productList"></main>
 
-  <footer>
-    <p>&copy; 2025 A One Hospitality Services</p>
+  <footer class="section" style="text-align:center;">
+    &copy; 2025 A One Hospitality Services
   </footer>
 
   <script>
-    let site = JSON.parse(localStorage.getItem("siteData")) || DEFAULT_DATA;
-    localStorage.setItem("siteData", JSON.stringify(site));
-
-    document.querySelector("header .logo").src = site.global.logo;
+    const site = JSON.parse(localStorage.getItem("siteData")) || DEFAULT_DATA;
+    document.querySelector(".logo").src = site.global.logo;
     document.querySelector(".tagline").textContent = site.global.tagline;
+    document.getElementById("pageTitle").textContent = site.pages.product?.title || "Products";
+
     const nav = document.getElementById("mainNav");
-    site.pages.product.nav.forEach(i => {
+    site.pages.index.nav.forEach(link => {
       const a = document.createElement("a");
-      a.href = i.href; a.textContent = i.text;
+      a.href = link.href;
+      a.textContent = link.text;
       nav.appendChild(a);
     });
 
-    document.getElementById("pageTitle").textContent = site.pages.product.title;
-
-    // render products
-    const products = site.products;
     const list = document.getElementById("productList");
+    const products = site.products || [];
     list.innerHTML = products.length
       ? products.map(p => `
           <div class="product-card">
             <img src="${p.image}" alt="${p.name}">
-            <div>
+            <div class="info">
               <h3>${p.name}</h3>
-              <p><strong>Category:</strong> ${p.category}</p>
               <p>${p.desc}</p>
+              <small>Category: ${p.category}</small>
             </div>
           </div>
         `).join("")
